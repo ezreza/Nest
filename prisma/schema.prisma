@@ -1,0 +1,71 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id               Int       @id @default(autoincrement())
+  name             String
+  phone            String
+  email            String    @unique
+  password         String
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  user_type        UserType  @default(BUYER)
+  homes            Home[]
+  relator_messages Message[] @relation("relator_messages")
+  buyer_messages   Message[] @relation("buyer_messages")
+}
+
+model Home {
+  id                  Int          @id @default(autoincrement())
+  address             String
+  number_of_bedrooms  Int
+  number_of_bathrooms Float
+  city                String
+  listed_date         DateTime     @default(now())
+  price               Float
+  property_type       PropertyType
+  images              Image[]
+  messages            Message[]
+  relator_id          Int
+  created_at          DateTime     @default(now())
+  updated_at          DateTime     @updatedAt
+  relator             User         @relation(fields: [relator_id], references: [id])
+}
+
+model Image {
+  id         Int      @id @default(autoincrement())
+  url        String
+  home_id    Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  home       Home     @relation(fields: [home_id], references: [id])
+}
+
+model Message {
+  id         Int    @id @default(autoincrement())
+  message    String
+  home_id    Int
+  home       Home   @relation(fields: [home_id], references: [id])
+  relator_id Int
+  relator    User   @relation("relator_messages", fields: [relator_id], references: [id])
+  buyer_id   Int
+  buyer      User   @relation("buyer_messages", fields: [buyer_id], references: [id])
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  CONDO
+}
+
+enum UserType {
+  BUYER
+  RELATOR
+  ADMIN
+}
