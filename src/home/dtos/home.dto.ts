@@ -1,5 +1,14 @@
-import { Exclude, Expose } from 'class-transformer';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { Exclude, Expose, Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsPositive,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { PropertyType } from 'src/generated/prisma/enums';
 
 export class HomeResponseDto {
@@ -24,6 +33,11 @@ export class HomeResponseDto {
 
   city: string;
   price: number;
+
+  @Exclude()
+  images?: { url: string }[];
+
+  image: string;
 
   @Exclude()
   property_type: PropertyType;
@@ -54,25 +68,69 @@ export class HomeResponseDto {
   }
 }
 
+export class CreateImageDto {
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+}
+
 export class CreateHomeDto {
   @IsString()
+  @IsNotEmpty()
   address: string;
 
   @IsNumber()
+  @IsPositive()
   number_of_bedrooms: number;
 
   @IsNumber()
+  @IsPositive()
   number_of_bathrooms: number;
 
   @IsString()
+  @IsNotEmpty()
   city: string;
 
   @IsNumber()
+  @IsPositive()
   price: number;
 
   @IsEnum(PropertyType)
   property_type: PropertyType;
 
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateImageDto)
+  images: CreateImageDto[];
+}
+
+export class UpdateHomeDto {
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  address?: string;
+
+  @IsOptional()
   @IsNumber()
-  relator_id: number;
+  @IsPositive()
+  number_of_bedrooms?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  number_of_bathrooms?: number;
+
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
+  city?: string;
+
+  @IsOptional()
+  @IsNumber()
+  @IsPositive()
+  price?: number;
+
+  @IsOptional()
+  @IsEnum(PropertyType)
+  property_type: PropertyType;
 }
