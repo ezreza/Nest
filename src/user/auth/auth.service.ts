@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import * as jwt from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { UserType } from 'src/generated/prisma/enums';
 
 interface registerParams {
@@ -22,7 +22,10 @@ interface loginParams {
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register({ name, email, phone, password }: registerParams) {
     const userExists = await this.prisma.user.findUnique({
@@ -45,7 +48,7 @@ export class AuthService {
       },
     });
 
-    return this.generateJWT(user.id, user.name);
+    return this.generateJWT(user.id);
   }
 
   async login({ email, password }: loginParams) {
@@ -54,34 +57,28 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credint');
+      throw new UnauthorizedException();
     }
 
     const hashedPassword = user.password;
     const isValidPassword = await bcrypt.compare(password, hashedPassword);
 
     if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid credint');
+      throw new UnauthorizedException();
     }
 
-    return this.generateJWT(user.id, user.name);
+    return this.generateJWT(user.id);
   }
 
   /**
    *
    * @param id
-   * @param name
    * @returns
    */
-  private generateJWT(id: number, name: string) {
-    const jwtSecret = process.env.JWT_SECRET_KEY;
-
-    if (!jwtSecret) {
-      throw new ForbiddenException('JWT secret key is not defined');
-    }
-
-    return jwt.sign({ id: id, name: name }, jwtSecret, {
-      expiresIn: '7d',
-    });
+  private async generateJWT(id: number) {
+    const payload = { sub: id };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }
