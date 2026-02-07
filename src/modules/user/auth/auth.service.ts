@@ -6,7 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { UserType } from 'src/generated/prisma/enums';
+import { UserType } from '@prisma/client';
 
 interface registerParams {
   name: string;

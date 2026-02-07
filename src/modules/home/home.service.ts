@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HomeResponseDto } from './dtos/home.dto';
-import { PropertyType } from 'src/generated/prisma/enums';
+import { PropertyType } from '@prisma/client';
+// import { PropertyType } from 'src/generated/prisma/enums';
 
 interface GetHomeParam {
   city?: string;

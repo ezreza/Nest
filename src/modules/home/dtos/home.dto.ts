@@ -1,3 +1,4 @@
+import { PropertyType } from '@prisma/client';
 import { Exclude, Expose, Type } from 'class-transformer';
 import {
   IsArray,
@@ -9,7 +10,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { PropertyType } from 'src/generated/prisma/enums';
 
 export class HomeResponseDto {
   id: number;
