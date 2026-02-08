@@ -1,18 +1,13 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto } from '../dtos/auth.dto';
-import type { AuthenticatedRequest } from './interface/auth.interface';
-import { Public } from '@/common/decorators/public.decorator';
+import { Public, User } from '@/common/decorators';
+import { LoginDto } from './dtos/auth-login.dto';
+import { RegisterDto } from './dtos/auth-register.dto';
+import type { SafeUser } from '@/common/interfaces';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Get('test')
-  test(@Req() req: AuthenticatedRequest) {
-    const user = req.user;
-    return user;
-  }
 
   @Public()
   @Post('register')
@@ -24,5 +19,10 @@ export class AuthController {
   @Post('login')
   login(@Body() body: LoginDto) {
     return this.authService.login(body);
+  }
+
+  @Get('me')
+  me(@User() user: SafeUser) {
+    return user;
   }
 }

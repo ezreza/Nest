@@ -23,11 +23,3 @@ export class RegisterDto {
   @MinLength(5)
   password: string;
 }
-
-export class LoginDto {
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  password: string;
-}

@@ -6,6 +6,14 @@ export interface JwtPayload {
   exp?: number;
 }
 
+export interface SafeUser {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  user_type: string;
+}
+
 export interface AuthenticatedRequest extends Request {
-  user: JwtPayload;
+  user: SafeUser;
 }

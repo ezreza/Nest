@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth/auth.controller';
-import { AuthService } from './auth/auth.service';
+import { AuthController } from '../auth/auth.controller';
+import { AuthService } from '../auth/auth.service';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './auth/auth.guard';
+import { AuthGuard } from '@/common/guards';
 
 @Module({
   imports: [
@@ -28,4 +28,4 @@ import { AuthGuard } from './auth/auth.guard';
     },
   ],
 })
-export class UserModule {}
+export class AuthModule {}

@@ -7,14 +7,19 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { IS_PUBLIC_KEY } from './decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
-import { AuthenticatedRequest, JwtPayload } from './interface/auth.interface';
+import { IS_PUBLIC_KEY } from '@/common/decorators/public.decorator';
+import {
+  AuthenticatedRequest,
+  JwtPayload,
+} from '@/common/interfaces/auth.interface';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
+    private prisma: PrismaService,
     private readonly config: ConfigService,
     private reflector: Reflector,
   ) {}
@@ -44,9 +49,23 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync<JwtPayload>(token, {
         secret,
       });
-      request.user = payload;
 
-      console.log(request.user);
+      const user = await this.prisma.user.findUnique({
+        where: {
+          id: payload.sub,
+        },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          email: true,
+          user_type: true,
+        },
+      });
+
+      if (!user) throw new UnauthorizedException();
+
+      request.user = user;
     } catch {
       throw new UnauthorizedException();
     }

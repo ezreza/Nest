@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
+import { AuthResponseDto } from './dtos/auth-response.dto';
 import { UserType } from '@prisma/client';
 
 interface registerParams {
@@ -68,6 +69,18 @@ export class AuthService {
     }
 
     return this.generateJWT(user.id);
+  }
+
+  async me(sub: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: sub },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+
+    return new AuthResponseDto(user);
   }
 
   /**
